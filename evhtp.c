@@ -1799,7 +1799,12 @@ _evhtp_connection_readcb(evbev_t * bev, void * arg) {
 
     htp_log_debug("buffer is\n----\n%.*s\n-----", (int)avail, (const char *)buf);
 
-    nread = htparser_run(c->parser, &request_psets, (const char *)buf, avail);
+    nread = 0;
+    bufferevent_disable(bev, EV_WRITE);
+    {
+        nread = htparser_run(c->parser, &request_psets, (const char *)buf, avail);
+    }
+    bufferevent_enable(bev, EV_WRITE);
 
     htp_log_debug("nread = %zu", nread);
 
